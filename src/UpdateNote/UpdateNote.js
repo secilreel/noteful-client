@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import NotefulForm from '../NotefulForm/NotefulForm'
-import './AddNote.css';
+import './UpdateNote.css';
 import config from '../config';
 import NotefulContext from '../context';
 
@@ -33,8 +33,8 @@ export default class AddNote extends Component {
       folderid: this.state.folderId,
       modified: new Date(),
     };
-    fetch(`${config.API_ENDPOINT}/noteful`,{
-      method: 'POST',
+    fetch(`${config.API_ENDPOINT}/note/:id`,{
+      method: 'PATCH',
       headers: {
         'content-type': 'application/json',
         Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`
@@ -56,7 +56,7 @@ export default class AddNote extends Component {
   render() {
     const { folders } = this.props;
     return (
-      <section className='AddNote'>
+      <section className='UpdateNote'>
         <h2>Create a note</h2>
         <NotefulForm onSubmit={this.handleSubmit}>
           <div className='field'>

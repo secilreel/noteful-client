@@ -1,4 +1,4 @@
 export default {
-    API_ENDPOINT: `https://warm-escarpment-56964.herokuapp.com/`,
+    API_ENDPOINT: `https://peaceful-ocean-73234.herokuapp.com/api`,
   }
   

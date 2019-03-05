@@ -12,6 +12,7 @@ import { getNotesForFolder, findNote, findFolder } from '../notes-helpers'
 import './App.css'
 import config from '../config';
 import NotefulContext from '../context';
+require('dotenv').config();
 
 class App extends Component {
   state = {
@@ -38,7 +39,7 @@ class App extends Component {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
-        'Authorization': `Bearer ${config.API_KEY}`
+        'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`
       }
     })
       .then(res => {
@@ -54,7 +55,7 @@ class App extends Component {
         method: 'GET',
         headers: {
           'content-type': 'application/json',
-          'Authorization': `Bearer ${config.API_KEY}`
+          'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`
         }
       })
         .then(res => {
@@ -68,11 +69,22 @@ class App extends Component {
   };
 
   addNote = (note) => {
-
     this.setState({
       notes: [...this.state.notes, note]
     })
-    console.log(this.state.notes)
+  }
+
+  addFolder = (folder) => {
+    this.setState({
+      folders: [...this.state.folders, folder]
+    })
+  }
+
+  deleteNote = (id) =>{
+    let newNotes=this.state.notes.filter(n=>n.id !== id);
+    this.setState({
+      notes: newNotes
+    })
   }
 
   renderNavRoutes() {
@@ -86,9 +98,9 @@ class App extends Component {
             path={path}
             render={routeProps =>
               <NoteListNav
+                {...routeProps}
                 folders={folders}
                 notes={notes}
-                {...routeProps}
               />
             }
           />
@@ -176,7 +188,10 @@ class App extends Component {
     const contextValue={ 
       notes: this.state.notes,
       folders: this.state.folders,
-      addNote: this.addNote };
+      addNote: this.addNote, 
+      addFolder: this.addFolder,
+      deleteNote: this.deleteNote
+    };
     return (
       <div className='App'>
         <NotefulContext.Provider value={contextValue}>
