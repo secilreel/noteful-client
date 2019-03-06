@@ -4,20 +4,17 @@ import './UpdateNote.css';
 import config from '../config';
 import NotefulContext from '../context';
 
-export default class AddNote extends Component {
+export default class UpdateNote extends Component {
   constructor(props){
     super(props)
     this.state = {
-    folderId:'',
     name: '',
-    content: ''
+    content: '',
   }
 }
+
   static contextType = NotefulContext;
   
-  chooseId(folderId) {
-    this.setState({folderId: Number(folderId)})};
-
   setName(name){
     this.setState({name})};
 
@@ -27,66 +24,58 @@ export default class AddNote extends Component {
 
   handleSubmit =(e) => {
     e.preventDefault();
-    const newNote={
+    const updatedNote={
       name: this.state.name,
       content: this.state.content,
-      folderid: this.state.folderId,
+      folderid: this.props.folderId,
       modified: new Date(),
     };
-    fetch(`${config.API_ENDPOINT}/note/:id`,{
+    fetch(`${config.API_ENDPOINT}/note/${this.props.note.id}`,{
       method: 'PATCH',
       headers: {
         'content-type': 'application/json',
         Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`
       },
-      body: JSON.stringify(newNote),
+      body: JSON.stringify(updatedNote),
     })
     .then(res =>{
-      if(res.ok) {
-        return res.json()}
-      else  throw new Error(res.status);
-      })
+      if(!res.ok) {
+        throw new Error(res.status);
+      }
+      else return res.json();
+    })
     .then(note => {
-      this.context.addNote(note)
+      console.log('updated', note)
+      this.context.updateNote(note[0])
       this.props.history.push('/')
     })
     .catch(error => console.error({error}) );
   };
 
   render() {
-    const { folders } = this.props;
     return (
       <section className='UpdateNote'>
-        <h2>Create a note</h2>
+        <h2>Update a note</h2>
         <NotefulForm onSubmit={this.handleSubmit}>
           <div className='field'>
             <label htmlFor='note-name-input'>
               Name
             </label>
-            <input type='text' id='note-name-input' onChange={(e)=> this.setName(e.target.value)}/>
+            <input type='text' id='note-name-input' 
+            defaultValue={(this.props.note)? this.props.note.name : ''}
+            onChange={(e)=> this.setName(e.target.value)}/>
           </div>
           <div className='field'>
             <label htmlFor='note-content-input'>
               Content
             </label>
-            <input type='text' id='note-content-input' onChange={(e)=> this.setContent(e.target.value)} />
-          </div>
-          <div className='field'>
-            <label htmlFor='note-folder-select'>
-              Folder
-            </label>
-            <select id='note-folder-select' onChange={(e)=> this.chooseId(e.target.value)}>
-              <option value={null}>...</option>
-              {folders.map(folder =>
-                <option key={folder.id} value={folder.id}>
-                  {folder.name}
-                </option>
-              )}
-            </select>
+            <input type='text' id='note-content-input' 
+            defaultValue={(this.props.note)? this.props.note.content : ''}
+            onChange={(e)=> this.setContent(e.target.value)} />
           </div>
           <div className='buttons'>
             <button type='submit'>
-              Add note
+              Update note
             </button>
           </div>
         </NotefulForm>

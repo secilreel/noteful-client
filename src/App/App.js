@@ -7,6 +7,7 @@ import NoteListMain from '../NoteListMain/NoteListMain'
 import NotePageMain from '../NotePageMain/NotePageMain'
 import AddFolder from '../AddFolder/AddFolder'
 import AddNote from '../AddNote/AddNote'
+import UpdateNote from '../UpdateNote/UpdateNote';
 // import dummyStore from '../dummy-store'
 import { getNotesForFolder, findNote, findFolder } from '../notes-helpers'
 import './App.css'
@@ -70,7 +71,7 @@ class App extends Component {
 
   addNote = (note) => {
     this.setState({
-      notes: [...this.state.notes, note]
+      notes: [...this.state.notes, note] 
     })
   }
 
@@ -87,6 +88,22 @@ class App extends Component {
     })
   }
 
+  updateNote = (note) =>{
+    let newNote=this.state.notes.find(n=> n.id == note.id)
+    newNote.name=note.name
+    newNote.content=note.content
+    const stateCopy = [...this.state.notes]
+    for (let i=0; i<stateCopy.length; i++){
+      if(stateCopy[i].id == note.id) {
+        stateCopy[i] = newNote;
+      }
+    }
+    this.setState({
+      notes: stateCopy
+    })
+
+  }
+  
   renderNavRoutes() {
     const { notes, folders } = this.state
     return (
@@ -153,12 +170,25 @@ class App extends Component {
           />
         )}
         <Route
-          path='/note/:noteId'
+          exact path='/note/:noteId'
           render={routeProps => {
             const { noteId } = routeProps.match.params
             const note = findNote(notes, noteId)
             return (
               <NotePageMain
+                {...routeProps}
+                note={note}
+              />
+            )
+          }}
+        />
+        <Route
+          exact path='/note/update/:noteId'
+          render={routeProps => {
+            const { noteId } = routeProps.match.params
+            const note = findNote(notes, noteId)
+            return (
+              <UpdateNote
                 {...routeProps}
                 note={note}
               />
@@ -190,7 +220,8 @@ class App extends Component {
       folders: this.state.folders,
       addNote: this.addNote, 
       addFolder: this.addFolder,
-      deleteNote: this.deleteNote
+      deleteNote: this.deleteNote,
+      updateNote: this.updateNote
     };
     return (
       <div className='App'>

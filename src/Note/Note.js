@@ -44,6 +44,12 @@ export default class Note extends Component {
         {' '}
         remove
       </button>
+      <button className='Note__delete' type='button'>
+      <Link to={`/note/update/${this.props.id}`} >
+        {' '}
+        update
+      </Link>
+      </button>
       <div className='Note__dates'>
         <div className='Note__dates-modified'>
           Modified
